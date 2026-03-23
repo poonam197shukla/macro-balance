@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: macro-balance-backend
+  datasource:
+    url: jdbc:postgresql://localhost:5432/macro_balance
+    username: postgres
+    password: postgres
