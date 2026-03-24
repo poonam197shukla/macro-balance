@@ -12,7 +12,10 @@ CREATE TABLE users
     is_email_verified BOOLEAN               DEFAULT FALSE,
     is_phone_verified BOOLEAN               DEFAULT FALSE,
     created_at        TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-    updated_at        TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+    updated_at        TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    created_by        VARCHAR(255),
+    updated_by        VARCHAR(255),
+    version           BIGINT                DEFAULT 0
 );
 
 -- =========================
@@ -53,9 +56,13 @@ CREATE TABLE products
 CREATE TABLE carts
 (
     id         BIGSERIAL PRIMARY KEY,
-    user_id    BIGINT      NOT NULL UNIQUE,
+    user_id    BIGINT,
+    guest_id   VARCHAR(255),
+    status     VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
     CONSTRAINT fk_cart_user
         FOREIGN KEY (user_id) REFERENCES users (id)
 );
