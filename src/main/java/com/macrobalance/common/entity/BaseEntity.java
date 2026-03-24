@@ -29,15 +29,15 @@ public abstract class BaseEntity {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime lastModifiedDate;
 
-//    @Version
-//    private Long version;
+    @Version
+    private Long version;
 
     @CreatedBy
-    @Column(name = "created_by")
+    @Column(name = "created_by", nullable = false)
     private String createdBy;
 
     @LastModifiedBy
-    @Column(name = "updated_by")
+    @Column(name = "updated_by", nullable = false)
     private String updatedBy;
 
 }

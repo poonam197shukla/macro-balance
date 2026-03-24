@@ -13,8 +13,8 @@ CREATE TABLE users
     is_phone_verified BOOLEAN               DEFAULT FALSE,
     created_at        TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
     updated_at        TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-    created_by        VARCHAR(255),
-    updated_by        VARCHAR(255),
+    created_by        VARCHAR(255) NOT NULL,
+    updated_by        VARCHAR(255) NOT NULL,
     version           BIGINT                DEFAULT 0
 );
 
@@ -58,13 +58,14 @@ CREATE TABLE carts
     id         BIGSERIAL PRIMARY KEY,
     user_id    BIGINT,
     guest_id   VARCHAR(255),
-    status     VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    status     VARCHAR(20)  NOT NULL DEFAULT 'ACTIVE',
 
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-
-    CONSTRAINT fk_cart_user
-        FOREIGN KEY (user_id) REFERENCES users (id)
+    created_at TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    created_by VARCHAR(255) NOT NULL,
+    updated_by VARCHAR(255) NOT NULL,
+    version    BIGINT                DEFAULT 0,
+        CONSTRAINT fk_cart_user FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 -- =========================
@@ -73,11 +74,14 @@ CREATE TABLE carts
 CREATE TABLE cart_items
 (
     id         BIGSERIAL PRIMARY KEY,
-    cart_id    BIGINT      NOT NULL,
-    product_id BIGINT      NOT NULL,
-    quantity   INTEGER     NOT NULL CHECK (quantity > 0),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    cart_id    BIGINT       NOT NULL,
+    product_id BIGINT       NOT NULL,
+    quantity   INTEGER      NOT NULL CHECK (quantity > 0),
+    created_at TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    created_by VARCHAR(255) NOT NULL,
+    updated_by VARCHAR(255) NOT NULL,
+    version    BIGINT                DEFAULT 0,
     CONSTRAINT fk_cartitem_cart
         FOREIGN KEY (cart_id) REFERENCES carts (id) ON DELETE CASCADE,
     CONSTRAINT fk_cartitem_product
