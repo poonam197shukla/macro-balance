@@ -22,20 +22,22 @@ public abstract class BaseEntity {
     private Long id;
 
     @CreatedDate
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdDate;
 
     @LastModifiedDate
-    @Column(nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime lastModifiedDate;
 
-    @Version
-    private Long version;
+//    @Version
+//    private Long version;
 
     @CreatedBy
+    @Column(name = "created_by")
     private String createdBy;
 
     @LastModifiedBy
+    @Column(name = "updated_by")
     private String updatedBy;
 
 }

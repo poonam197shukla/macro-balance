@@ -1,4 +1,9 @@
 package com.macrobalance.user.dto;
 
-public class RegisterRequest {
+public record RegisterRequest(
+        String name,
+        String email,
+        String phone,
+        String password
+) {
 }

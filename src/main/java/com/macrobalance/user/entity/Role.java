@@ -1,4 +1,6 @@
 package com.macrobalance.user.entity;
 
-public class Role {
+public enum Role {
+    USER,
+    ADMIN
 }
