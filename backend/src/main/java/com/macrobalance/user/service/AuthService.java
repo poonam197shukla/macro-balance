@@ -54,6 +54,10 @@ public class AuthService {
                 )
         );
 
-        return jwtUtil.generateToken(request.email());
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow();
+
+        return jwtUtil.generateToken(user.getId(), user.getEmail());
     }
+
 }

@@ -2,8 +2,9 @@ package com.macrobalance.cart.controller;
 
 import com.macrobalance.cart.entity.CartItem;
 import com.macrobalance.cart.service.CartService;
+import com.macrobalance.security.jwt.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,6 +15,8 @@ import java.util.List;
 public class CartController {
 
     private final CartService cartService;
+    private final JwtUtil jwtUtil;
+
 
     // 🔹 Add to Cart
     @PostMapping("/add")
@@ -21,10 +24,9 @@ public class CartController {
             @RequestHeader(value = "X-Guest-Id", required = false) String guestId,
             @RequestParam Long productId,
             @RequestParam int quantity,
-            Authentication authentication
-    ) {
+            HttpServletRequest request) {
 
-        Long userId = extractUserId(authentication);
+        Long userId = extractUserId(request);
 
         cartService.addToCart(userId, guestId, productId, quantity);
     }
@@ -33,23 +35,23 @@ public class CartController {
     @GetMapping
     public List<CartItem> getCart(
             @RequestHeader(value = "X-Guest-Id", required = false) String guestId,
-            Authentication authentication
-    ) {
+            HttpServletRequest request) {
 
-        Long userId = extractUserId(authentication);
+        Long userId = extractUserId(request);
 
         return cartService.getCart(userId, guestId);
     }
 
     // 🔥 Extract userId from auth (simple version)
-    private Long extractUserId(Authentication authentication) {
+    private Long extractUserId(HttpServletRequest request) {
 
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return null;
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            return jwtUtil.extractUserId(token);
         }
 
-        // for now using email as principal
-        // later you should fetch userId from DB or JWT
-        return null; // TODO: implement properly
+        return null;
     }
 }
