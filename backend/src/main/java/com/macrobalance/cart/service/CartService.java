@@ -1,5 +1,7 @@
 package com.macrobalance.cart.service;
 
+import com.macrobalance.cart.dto.CartItemResponse;
+import com.macrobalance.cart.dto.CartResponse;
 import com.macrobalance.cart.entity.Cart;
 import com.macrobalance.cart.entity.CartItem;
 import com.macrobalance.cart.repository.CartItemRepository;
@@ -19,7 +21,7 @@ public class CartService {
 
     private static final String ACTIVE = "ACTIVE";
 
-    // 🔹 Get or Create Cart
+    // Get or Create Cart
     public Cart getOrCreateCart(Long userId, String guestId) {
 
         if (userId != null) {
@@ -39,7 +41,7 @@ public class CartService {
                 });
     }
 
-    // 🔹 Add to Cart
+    // Add to Cart
     public void addToCart(Long userId, String guestId, Long productId, int quantity) {
 
         Cart cart = getOrCreateCart(userId, guestId);
@@ -61,14 +63,23 @@ public class CartService {
         }
     }
 
-    // 🔹 Get Cart Items
-    public List<CartItem> getCart(Long userId, String guestId) {
+    // Get Cart Items
+    public CartResponse getCart(Long userId, String guestId) {
 
         Cart cart = getOrCreateCart(userId, guestId);
-        return cartItemRepository.findByCart(cart);
+
+        List<CartItemResponse> items = cartItemRepository.findByCart(cart)
+                .stream()
+                .map(item -> new CartItemResponse(
+                        item.getProductId(),
+                        item.getQuantity()
+                ))
+                .toList();
+
+        return new CartResponse(cart.getId(), items);
     }
 
-    // 🔥 Merge Cart (IMPORTANT)
+    // Merge Cart (IMPORTANT)
     public void mergeCart(String guestId, Long userId) {
 
         Optional<Cart> guestCartOpt =

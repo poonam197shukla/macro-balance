@@ -1,7 +1,9 @@
 package com.macrobalance.user.controller;
 
+import com.macrobalance.common.dto.ApiResponse;
 import com.macrobalance.user.dto.LoginRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,12 +21,16 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public String register(@RequestBody RegisterRequest request) {
-        return authService.register(request);
+    public ResponseEntity<ApiResponse<String>> register(@RequestBody RegisterRequest request) {
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "User registered successfully", authService.register(request))
+        );
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest request) {
-        return authService.login(request);
+    public ResponseEntity<ApiResponse<String>> login(@RequestBody LoginRequest request) {
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "Login successful", authService.login(request))
+        );
     }
 }
