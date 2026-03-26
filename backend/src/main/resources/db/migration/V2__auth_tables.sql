@@ -22,6 +22,7 @@ CREATE TABLE otp_requests
     user_id    BIGINT,
     email      VARCHAR(255),
     phone      VARCHAR(20),
+    type       VARCHAR(20), -- EMAIL / PHONE
     hashed_otp VARCHAR(255) NOT NULL,
     attempts   INTEGER               DEFAULT 0,
     expires_at TIMESTAMPTZ  NOT NULL,
