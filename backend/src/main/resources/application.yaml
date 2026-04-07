@@ -43,10 +43,7 @@ razorpay:
   webhook-secret: ${RAZORPAY_WEBHOOK_SECRET}
 
 logging:
-  level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.flywaydb: DEBUG
+  config: classpath:logback-spring.xml
 
 management:
   endpoints:
