@@ -23,10 +23,13 @@ CREATE TABLE users
 -- =========================
 CREATE TABLE categories
 (
-    id         BIGSERIAL PRIMARY KEY,
-    name       VARCHAR(150) NOT NULL UNIQUE,
-    created_at TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+    id          BIGSERIAL PRIMARY KEY,
+    name        VARCHAR(150)  NOT NULL UNIQUE,
+    slug        VARCHAR(150)  NOT NULL UNIQUE,  -- for URL: /shop/date-bits
+    description TEXT,
+    is_active   BOOLEAN       NOT NULL DEFAULT TRUE,
+    created_at  TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ   NOT NULL DEFAULT NOW()
 );
 
 -- =========================
@@ -34,20 +37,62 @@ CREATE TABLE categories
 -- =========================
 CREATE TABLE products
 (
-    id          BIGSERIAL PRIMARY KEY,
-    name        VARCHAR(255)   NOT NULL,
-    description TEXT,
-    price       NUMERIC(10, 2) NOT NULL CHECK (price >= 0),
-    protein     INTEGER                 DEFAULT 0,
-    fiber       INTEGER                 DEFAULT 0,
-    sugar       INTEGER                 DEFAULT 0,
-    stock       INTEGER        NOT NULL CHECK (stock >= 0),
-    category_id BIGINT         NOT NULL,
-    is_active   BOOLEAN                 DEFAULT TRUE,
-    created_at  TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
-    updated_at  TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
+    id           BIGSERIAL PRIMARY KEY,
+    name         VARCHAR(255)   NOT NULL,
+    slug         VARCHAR(255)   NOT NULL UNIQUE,  -- for URL: /products/date-bits-classic-cocoa
+    description  TEXT,
+    price        NUMERIC(10, 2) NOT NULL CHECK (price >= 0),
+    stock        INTEGER        NOT NULL CHECK (stock >= 0),
+    category_id  BIGINT         NOT NULL,
+    is_active    BOOLEAN        NOT NULL DEFAULT TRUE,
+    avg_rating   DECIMAL(2, 1)           DEFAULT 0.0,
+    review_count INTEGER                 DEFAULT 0,
+    created_at   TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
+    updated_at   TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_product_category
         FOREIGN KEY (category_id) REFERENCES categories (id)
+);
+
+-- =========================
+-- PRODUCT NUTRITION
+-- =========================
+CREATE TABLE product_nutrition
+(
+    id             BIGSERIAL PRIMARY KEY,
+    product_id     BIGINT         NOT NULL UNIQUE,
+    serving_size_g INTEGER        NOT NULL DEFAULT 100,
+    calories       DECIMAL(6, 1)           DEFAULT 0.0,
+    protein        DECIMAL(5, 1)           DEFAULT 0.0,
+    carbs          DECIMAL(5, 1)           DEFAULT 0.0,
+    fiber          DECIMAL(5, 1)           DEFAULT 0.0,
+    sugar          DECIMAL(5, 1)           DEFAULT 0.0,
+    fat            DECIMAL(5, 1)           DEFAULT 0.0,
+    created_at     TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
+    updated_at     TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_nutrition_product
+        FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE
+);
+
+-- =========================
+-- PRODUCT REVIEWS
+-- =========================
+CREATE TABLE product_reviews
+(
+    id                   BIGSERIAL PRIMARY KEY,
+    product_id           BIGINT      NOT NULL,
+    user_id              BIGINT      NOT NULL,
+    rating               SMALLINT    NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    title                VARCHAR(150),
+    body                 TEXT,
+    is_verified_purchase BOOLEAN     NOT NULL DEFAULT FALSE,
+    created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_review_product
+        FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
+    CONSTRAINT fk_review_user
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    CONSTRAINT unique_user_product_review
+        UNIQUE (user_id, product_id)
 );
 
 -- =========================
