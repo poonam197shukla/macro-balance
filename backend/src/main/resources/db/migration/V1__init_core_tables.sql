@@ -153,8 +153,13 @@ CREATE TABLE addresses
     state       VARCHAR(100) NOT NULL,
     postal_code VARCHAR(20)  NOT NULL,
     country     VARCHAR(100) NOT NULL DEFAULT 'India',
+    label      VARCHAR(50),
+    is_default BOOLEAN NOT NULL DEFAULT FALSE,
     created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
     updated_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    created_by VARCHAR(255) NOT NULL,
+    updated_by VARCHAR(255) NOT NULL,
+    version    BIGINT                DEFAULT 0,
     CONSTRAINT fk_address_user
         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
