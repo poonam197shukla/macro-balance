@@ -2,9 +2,7 @@
 <configuration>
 
     <!-- ── Properties ────────────────────────────────────────── -->
-    <springProperty scope="context" name="macro-balance-backend"
-                    source="spring.application.name"
-                    defaultValue="macro-balance"/>
+    <property name="APP_NAME" value="macro-balance-backend"/>
 
     <property name="LOG_DIR"     value="logs"/>
     <property name="MAX_SIZE"    value="10MB"/>
