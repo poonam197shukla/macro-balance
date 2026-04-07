@@ -141,18 +141,41 @@ CREATE TABLE cart_items
 );
 
 -- =========================
+-- ADDRESSES
+-- =========================
+CREATE TABLE addresses
+(
+    id          BIGSERIAL PRIMARY KEY,
+    user_id     BIGINT       NOT NULL,
+    line1       VARCHAR(255) NOT NULL,
+    line2       VARCHAR(255),
+    city        VARCHAR(100) NOT NULL,
+    state       VARCHAR(100) NOT NULL,
+    postal_code VARCHAR(20)  NOT NULL,
+    country     VARCHAR(100) NOT NULL DEFAULT 'India',
+    created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_address_user
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+-- =========================
 -- ORDERS
 -- =========================
 CREATE TABLE orders
 (
-    id           BIGSERIAL PRIMARY KEY,
-    user_id      BIGINT         NOT NULL,
-    total_amount NUMERIC(10, 2) NOT NULL CHECK (total_amount >= 0),
-    status       VARCHAR(50)    NOT NULL,
-    created_at   TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
-    updated_at   TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
+    id             BIGSERIAL PRIMARY KEY,
+    user_id        BIGINT         NOT NULL,
+    address_id     BIGINT         NOT NULL,   -- which address was used
+    total_amount   NUMERIC(10, 2) NOT NULL CHECK (total_amount >= 0),
+    status         VARCHAR(50)    NOT NULL DEFAULT 'PENDING',
+    notes          TEXT,                      -- optional delivery notes
+    created_at     TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
+    updated_at     TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_order_user
-        FOREIGN KEY (user_id) REFERENCES users (id)
+        FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT fk_order_address
+        FOREIGN KEY (address_id) REFERENCES addresses (id)
 );
 
 -- =========================
@@ -163,6 +186,7 @@ CREATE TABLE order_items
     id                BIGSERIAL PRIMARY KEY,
     order_id          BIGINT         NOT NULL,
     product_id        BIGINT         NOT NULL,
+    product_name      VARCHAR(255)   NOT NULL, -- snapshot at purchase time
     quantity          INTEGER        NOT NULL CHECK (quantity > 0),
     price_at_purchase NUMERIC(10, 2) NOT NULL,
     created_at        TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
