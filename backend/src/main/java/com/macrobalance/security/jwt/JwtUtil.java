@@ -24,10 +24,11 @@ public class JwtUtil {
                 .compact();
     }*/
 
-    public String generateToken(Long userId, String email) {
+    public String generateToken(Long userId, String email, String role) {
         return Jwts.builder()
                 .subject(email)
                 .claim("userId", userId)
+                .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 86400000))
                 .signWith(key)
@@ -40,6 +41,10 @@ public class JwtUtil {
 
     public String extractUsername(String token) {
         return getClaims(token).getSubject();
+    }
+
+    public String extractRole(String token) {
+        return getClaims(token).get("role", String.class);
     }
 
     public boolean validateToken(String token, String username) {

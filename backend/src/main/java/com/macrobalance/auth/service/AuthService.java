@@ -47,7 +47,7 @@ public class AuthService {
                 userRepository.findByEmail(identifier).orElseThrow() :
                 userRepository.findByPhone(identifier).orElseThrow();
 
-        return jwtUtil.generateToken(user.getId(), user.getEmail());
+        return jwtUtil.generateToken(user.getId(), user.getEmail(), String.valueOf(user.getRole()));
     }
 
     public void resetPassword(String identifier, String otp, String newPassword) {
@@ -82,7 +82,7 @@ public class AuthService {
 
         userRepository.save(user);
 
-        return jwtUtil.generateToken(user.getId(), user.getEmail());
+        return jwtUtil.generateToken(user.getId(), user.getEmail(), String.valueOf(user.getRole()));
     }
 
     public String login(LoginRequest request) {
@@ -101,7 +101,7 @@ public class AuthService {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow();
 
-        return jwtUtil.generateToken(user.getId(), user.getEmail());
+        return jwtUtil.generateToken(user.getId(), user.getEmail(), String.valueOf(user.getRole()));
     }
 
 }
