@@ -13,6 +13,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -21,6 +22,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+    private final CorsConfigurationSource corsConfigurationSource; // ← add this
 
     @Bean
     public AuthenticationManager authenticationManager(
@@ -36,33 +38,25 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(csrf -> csrf.disable())
+        http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource)) // ← add this
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
 
-                        // Fully public — no login needed
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/products/**").permitAll()
                         .requestMatchers("/api/categories/**").permitAll()
 
-                        // Cart is semi-public — guests can add items
-                        .requestMatchers(
-                                HttpMethod.GET, "/api/cart").permitAll()
-                        .requestMatchers(
-                                HttpMethod.POST, "/api/cart/items").permitAll()
-                        .requestMatchers(
-                                HttpMethod.PUT, "/api/cart/items/**").permitAll()
-                        .requestMatchers(
-                                HttpMethod.DELETE, "/api/cart/items/**").permitAll()
-                        .requestMatchers(
-                                HttpMethod.DELETE, "/api/cart").permitAll()
+                        .requestMatchers(HttpMethod.GET,    "/api/cart").permitAll()
+                        .requestMatchers(HttpMethod.POST,   "/api/cart/items").permitAll()
+                        .requestMatchers(HttpMethod.PUT,    "/api/cart/items/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/cart/items/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/cart").permitAll()
 
-                        // Webhook has no JWT — called by Razorpay servers
-                        .requestMatchers(
-                                HttpMethod.POST, "/api/payments/webhook").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/payments/webhook").permitAll()
 
-                        // Swagger
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
