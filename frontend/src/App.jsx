@@ -6,7 +6,6 @@ import ShopAll from './pages/ShopAll'
 import NewLaunches from './pages/NewLaunches'
 import About from './pages/About'
 import Login from './pages/Login'
-import Search from './pages/Search'
 import Cart from './pages/Cart'
 import FindYourBalance from './pages/FindYourBalance'
 import NotFound from './pages/NotFound'
@@ -24,7 +23,6 @@ export default function App() {
             <Route path="/new" element={<NewLaunches />} />
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/search" element={<Search />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/balance" element={<FindYourBalance />} />
             <Route path="/home" element={<Navigate to="/" replace />} />

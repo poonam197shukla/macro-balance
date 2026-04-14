@@ -2,7 +2,8 @@ import React, { useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import SectionHeader from '../components/SectionHeader'
 import ProductCard from '../components/ProductCard'
-import { CATEGORIES, PRODUCTS } from '../data/products'
+import { CATEGORIES } from '../data/products'
+import { useProducts } from '../hooks/useProducts'
 
 function useQuery() {
   const { search } = useLocation()
@@ -14,9 +15,11 @@ export default function ShopAll() {
   const initialCategory = query.get('category') || 'All'
   const [category, setCategory] = useState(initialCategory)
   const [sort, setSort] = useState('featured')
+  const { products, loading, error } = useProducts()
 
   const filtered = useMemo(() => {
-    let arr = [...PRODUCTS]
+    if (!products.length) return []
+    let arr = [...products]
     if (category !== 'All') arr = arr.filter(p => p.category === category)
 
     if (sort === 'price_asc') arr.sort((a,b) => a.price - b.price)
@@ -24,7 +27,23 @@ export default function ShopAll() {
     if (sort === 'protein_desc') arr.sort((a,b) => (b.nutrition.protein_g - a.nutrition.protein_g))
 
     return arr
-  }, [category, sort])
+  }, [category, sort, products])
+
+  if (loading) {
+    return (
+      <div style={{ padding: 20, textAlign: 'center' }}>
+        <div>Loading products...</div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div style={{ padding: 20, textAlign: 'center', color: 'red' }}>
+        <div>Error loading products: {error}</div>
+      </div>
+    )
+  }
 
   return (
     <div>

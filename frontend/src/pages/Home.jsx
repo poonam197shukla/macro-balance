@@ -1,10 +1,13 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import SectionHeader from '../components/SectionHeader'
-import { CATEGORIES, PRODUCTS } from '../data/products'
+import { CATEGORIES } from '../data/products'
 import ProductCard from '../components/ProductCard'
+import { useProducts } from '../hooks/useProducts'
 
 export default function Home() {
+  const { products, loading, error } = useProducts()
+
   return (
     <div className="grid" style={{gap:18}}>
       <SectionHeader
@@ -38,9 +41,19 @@ export default function Home() {
 
       <div>
         <h2 className="h2">Top picks</h2>
-        <div className="grid" style={{gridTemplateColumns:'repeat(auto-fit, minmax(250px, 1fr))'}}>
-          {PRODUCTS.slice(0, 4).map(p => <ProductCard key={p.id} product={p} />)}
-        </div>
+        {loading ? (
+          <div style={{ padding: 20, textAlign: 'center' }}>
+            <div>Loading products...</div>
+          </div>
+        ) : error ? (
+          <div style={{ padding: 20, textAlign: 'center', color: 'red' }}>
+            <div>Error loading products: {error}</div>
+          </div>
+        ) : (
+          <div className="grid" style={{gridTemplateColumns:'repeat(auto-fit, minmax(250px, 1fr))'}}>
+            {products.slice(0, 4).map(p => <ProductCard key={p.id} product={p} />)}
+          </div>
+        )}
       </div>
     </div>
   )

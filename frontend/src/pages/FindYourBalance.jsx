@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import SectionHeader from '../components/SectionHeader'
-import { PRODUCTS } from '../data/products'
 import ProductCard from '../components/ProductCard'
+import { useProducts } from '../hooks/useProducts'
 
 const QUESTIONS = [
   {
@@ -38,6 +38,7 @@ const QUESTIONS = [
 
 export default function FindYourBalance() {
   const [answers, setAnswers] = useState({})
+  const { products, loading, error } = useProducts()
 
   function select(key, opt) {
     setAnswers(prev => ({ ...prev, [key]: opt }))
@@ -46,16 +47,16 @@ export default function FindYourBalance() {
   const done = Object.keys(answers).length === QUESTIONS.length
 
   const recommendations = useMemo(() => {
-    if (!done) return []
+    if (!done || !products.length) return []
     const tags = Object.values(answers).map(a => a.tag.toLowerCase())
-    let scored = PRODUCTS.map(p => {
+    let scored = products.map(p => {
       const hay = `${p.name} ${p.category} ${p.tag}`.toLowerCase()
       const score = tags.reduce((s, t) => s + (hay.includes(t) ? 1 : 0), 0)
       return { p, score }
     })
     scored.sort((a,b) => b.score - a.score)
     return scored.filter(x => x.score > 0).slice(0, 4).map(x => x.p)
-  }, [answers, done])
+  }, [answers, done, products])
 
   return (
     <div className="grid" style={{gap:16}}>
@@ -91,7 +92,15 @@ export default function FindYourBalance() {
       {done ? (
         <div>
           <h2 className="h2">Your recommendations</h2>
-          {recommendations.length ? (
+          {loading ? (
+            <div style={{ padding: 20, textAlign: 'center' }}>
+              <div>Loading products...</div>
+            </div>
+          ) : error ? (
+            <div style={{ padding: 20, textAlign: 'center', color: 'red' }}>
+              <div>Error loading products: {error}</div>
+            </div>
+          ) : recommendations.length ? (
             <div className="grid" style={{gridTemplateColumns:'repeat(auto-fit, minmax(260px, 1fr))'}}>
               {recommendations.map(p => <ProductCard key={p.id} product={p} />)}
             </div>
